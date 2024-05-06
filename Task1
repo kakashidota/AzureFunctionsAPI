@@ -1,77 +1,57 @@
-Certainly! Below is a structured lab exercise designed to guide your students through creating an Azure Functions API that interfaces with the OpenAI ChatGPT API using .NET. This exercise will help them learn about serverless architectures, HTTP triggers, and API integrations.
-
----
-
-# Lab Exercise: Building an Azure Functions API with OpenAI Integration
-
-## Objective
+Lab Exercise: Building an Azure Functions API with OpenAI Integration
+Objective
 In this lab exercise, you will create an Azure Functions API that communicates with the OpenAI ChatGPT API. By the end of this exercise, you will understand how to set up Azure Functions, handle HTTP triggers, and integrate external APIs using .NET.
 
-## Prerequisites
-- An Azure account with active subscription (Create one at [Azure Portal](https://portal.azure.com/))
-- Visual Studio 2019 or later with Azure development workload installed
-- Basic understanding of C# and HTTP protocols
+Prerequisites
+An Azure account with active subscription (Create one at Azure Portal)
+Visual Studio 2019 or later with Azure development workload installed
+Basic understanding of C# and HTTP protocols
+Exercise Steps
+Part 1: Setup and Configuration
+Task 1: Install Necessary Tools
+Download and install Azure CLI from Azure CLI.
+Ensure Visual Studio 2019 or later is installed with the Azure development workload.
+Task 2: Create an Azure Function App
+Open Visual Studio and create a new project.
+Select Azure Functions as project type, name your project, and choose a location.
+Select the HTTP trigger template, set the authorization level to Function, and create the project.
+Part 2: OpenAI API Integration
+Task 3: Obtain OpenAI API Key
+Register at OpenAI and get your API key.
+Task 4: Add OpenAI SDK to Your Project
+Open the Package Manager Console in Visual Studio and execute:
+bash
+Copy code
+Install-Package OpenAI -Version <latest-version>
+Task 5: Configure API Key in Azure
+Go to your published Function App in the Azure portal.
+Navigate to Configuration under Settings.
+Add a new application setting named OpenAIKey and paste your OpenAI API key as its value.
+Part 3: Modifying and Testing the Azure Function
+Task 6: Modify Your Azure Function
+Open Function1.cs or your function's code file in Visual Studio.
+Add the following using directive at the top of the file:
+csharp
+Copy code
+using OpenAI_API;
+Replace the function code with:
+csharp
+Copy code
+public static async Task<IActionResult> Run(
+    [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
+    ILogger log)
+{
+    string prompt = req.Query["prompt"];
 
-## Exercise Steps
+    var apiKey = Environment.GetEnvironmentVariable("OpenAIKey");
+    var api = new OpenAIAPI(apiKey);
 
-### Part 1: Setup and Configuration
-#### Task 1: Install Necessary Tools
-1. **Download and install Azure CLI** from [Azure CLI](https://docs.microsoft.com/cli/azure/install-azure-cli).
-2. **Ensure Visual Studio 2019 or later is installed** with the Azure development workload.
+    var response = await api.Completions.CreateCompletionAsync(prompt, engine: "text-davinci-003");
 
-#### Task 2: Create an Azure Function App
-1. Open Visual Studio and create a new project.
-2. Select **Azure Functions** as project type, name your project, and choose a location.
-3. Select the **HTTP trigger** template, set the authorization level to **Function**, and create the project.
-
-### Part 2: OpenAI API Integration
-#### Task 3: Obtain OpenAI API Key
-1. Register at [OpenAI](https://openai.com/api/) and get your API key.
-
-#### Task 4: Add OpenAI SDK to Your Project
-1. Open the Package Manager Console in Visual Studio and execute:
-   ```bash
-   Install-Package OpenAI -Version <latest-version>
-   ```
-
-#### Task 5: Configure API Key in Azure
-1. Go to your published Function App in the Azure portal.
-2. Navigate to **Configuration** under Settings.
-3. Add a new application setting named `OpenAIKey` and paste your OpenAI API key as its value.
-
-### Part 3: Modifying and Testing the Azure Function
-#### Task 6: Modify Your Azure Function
-1. Open `Function1.cs` or your function's code file in Visual Studio.
-2. Add the following using directive at the top of the file:
-   ```csharp
-   using OpenAI_API;
-   ```
-3. Replace the function code with:
-   ```csharp
-   public static async Task<IActionResult> Run(
-       [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
-       ILogger log)
-   {
-       string prompt = req.Query["prompt"];
-
-       var apiKey = Environment.GetEnvironmentVariable("OpenAIKey");
-       var api = new OpenAIAPI(apiKey);
-
-       var response = await api.Completions.CreateCompletionAsync(prompt, engine: "text-davinci-003");
-
-       return new OkObjectResult(response.ToString());
-   }
-   ```
-4. Save your changes.
-
-#### Task 7: Publish and Test Your Function
-1. Republish your Azure Function to Azure.
-2. Test the function locally using Visual Studio and an HTTP client like Postman.
-3. After local testing, use the published URL to test the function deployed in Azure.
-
-### Conclusion
-Congratulations! You have successfully created an Azure Function that integrates with the OpenAI ChatGPT API. You can now explore further enhancements such as adding more robust error handling, improving security measures, or creating additional API endpoints.
-
----
-
-This exercise provides a comprehensive guide, allowing students to learn through hands-on practice, enhancing their skills in modern cloud services and API interactions.
+    return new OkObjectResult(response.ToString());
+}
+Save your changes.
+Task 7: Publish and Test Your Function
+Republish your Azure Function to Azure.
+Test the function locally using Visual Studio and an HTTP client like Postman.
+After local testing, use the published URL to test the function deployed in Azure.
